@@ -4,6 +4,14 @@
     <TargetFramework>net5.0</TargetFramework>
     <AssemblyName>Verhaeg.IoT.Processor</AssemblyName>
     <RootNamespace>Verhaeg.IoT.Processor</RootNamespace>
+    <Authors>Mario Verhaeg</Authors>
+    <Product>Verhaeg.IoT</Product>
+    <PackageProjectUrl>https://www.marioverhaeg.nl</PackageProjectUrl>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageIcon></PackageIcon>
+    <RepositoryUrl>https://github.com/marioverhaeg/Verhaeg.IoT.Processor</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <PackageTags>log queue task</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

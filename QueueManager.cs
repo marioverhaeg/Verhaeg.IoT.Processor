@@ -5,8 +5,6 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
-using System.IO;
-using Microsoft.Extensions.Configuration;
 
 namespace Verhaeg.IoT.Processor
 {
@@ -14,13 +12,13 @@ namespace Verhaeg.IoT.Processor
     {
         // Fields
         protected ConcurrentQueue<object> cq;
-        protected Boolean blKeepRunning;
+        protected bool blKeepRunning;
         protected EventWaitHandle ewh;
         protected Task t;
         protected CancellationTokenSource cts;
 
         // Logging
-        protected Serilog.ILogger Log;
+        protected ILogger Log;
 
         protected QueueManager(string name)
         {

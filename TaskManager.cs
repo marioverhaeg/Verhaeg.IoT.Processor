@@ -13,7 +13,7 @@ namespace Verhaeg.IoT.Processor
     public abstract class TaskManager : IDisposable
     {
         // Fields
-        protected Boolean blKeepRunning;
+        protected bool blKeepRunning;
         protected EventWaitHandle ewh;
         protected Task t;
         protected CancellationTokenSource cts;
