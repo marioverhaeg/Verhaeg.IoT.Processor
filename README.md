@@ -11,6 +11,17 @@ Verhaeg.IoT.Processor has three sub classes:
 Serilog.ILogger l = Processor.Log.CreateLog("Name of logfile");
 l.Debug("Debug...");
 ```
+
+Don't forget to configure the MinimumLevel for Serilog in the appsettings.json file of your project:
+```xml
+{
+  "Serilog": {
+    "Using": [ "Serilog.Sinks.File" ],
+    "MinimumLevel": "Debug"
+  }
+}
+
+```
 ## TaskManager.cs
 
 ```csharp
