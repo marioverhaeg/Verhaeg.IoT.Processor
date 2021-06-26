@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd ..\Verhaeg.Iot.Processor\bin\Debug &amp;&amp; dotnet nuget push *.nupkg -k oy2auk3ftivsiilp6edao46gohrcam6epcs6dloptarmay -s https://api.nuget.org/v3/index.json --skip-duplicate" />
+    <Exec Command="cd ..\Verhaeg.Iot.Processor\bin\Debug &amp;&amp; dotnet nuget push *.nupkg -k  -s https://api.nuget.org/v3/index.json --skip-duplicate" />
   </Target>
 
 </Project>
