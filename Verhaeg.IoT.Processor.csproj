@@ -12,6 +12,13 @@
     <RepositoryUrl>https://github.com/marioverhaeg/Verhaeg.IoT.Processor</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageTags>log queue task</PackageTags>
+    <Version>1.0.6</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Deterministic>false</Deterministic>
+    <Copyright />
+    <Description>Base class for a thread-safe queue- and taskmanager, including a base for using SeriLog.</Description>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,5 +28,9 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cd ..\Verhaeg.Iot.Processor\bin\Debug &amp;&amp; dotnet nuget push *.nupkg -k oy2auk3ftivsiilp6edao46gohrcam6epcs6dloptarmay -s https://api.nuget.org/v3/index.json --skip-duplicate" />
+  </Target>
 
 </Project>

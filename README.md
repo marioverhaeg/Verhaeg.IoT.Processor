@@ -1,9 +1,9 @@
 # Introduction
-Verhaeg.IoT.Processor has three sub classes:
+Verhaeg.IoT.Processor has three purposes:
 
-* Log wrappes Serilog for re-use. 
-* QueueManager is an abstract thread-safe singleton queue in which objects can be written and processed.
-* TaskManager is an abstract thread-safe singleton task.
+* Wrapping Serilog for re-use (Log.cs). 
+* Thread-safe management of a queue: QueueManager.cs is an abstract thread-safe singleton queue in which objects can be written and processed.
+* Thread-safe management of a task: TaskManager is an abstract thread-safe singleton task.
 
 # Examples
 ## Log.cs
@@ -23,7 +23,7 @@ Don't forget to configure the MinimumLevel for Serilog in the appsettings.json f
 
 ```
 ## TaskManager.cs
-
+This is an abstract class that needs to be inherited. You can use the Instance() method 
 ```csharp
 Processor.TaskManager.Instance(); // Starts a thread including log file.
 ```
