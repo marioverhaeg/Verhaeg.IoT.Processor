@@ -29,8 +29,4 @@
     <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cd ..\Verhaeg.Iot.Processor\bin\Debug &amp;&amp; dotnet nuget push *.nupkg -k oy2auk3ftivsiilp6edao46gohrcam6epcs6dloptarmay -s https://api.nuget.org/v3/index.json --skip-duplicate" />
-  </Target>
-
 </Project>
