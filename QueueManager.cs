@@ -46,7 +46,7 @@ namespace Verhaeg.IoT.Processor
                 if (cq.Count > 0)
                 {
                     // Read message from queue
-                    Log.Debug("Reading message from queue...");
+                    //Log.Debug("Reading message from queue...");
                     Read();
                 }
                 else
@@ -62,7 +62,7 @@ namespace Verhaeg.IoT.Processor
         {
             object obj;
             cq.TryDequeue(out obj);
-            Log.Debug("Removed message from queue.");
+            //Log.Debug("Removed message from queue.");
             Process(obj);
         }
 

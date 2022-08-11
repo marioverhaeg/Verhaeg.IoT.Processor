@@ -43,7 +43,7 @@ namespace Verhaeg.IoT.Processor
                 
         public void Stop()
         {
-            Log.Debug("Stop command received, checking queue...");
+            Log.Debug("Stop command received...");
             // Wait until queue is empty
             cts.Cancel();
             Log.Debug("Stopped working.");
