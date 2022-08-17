@@ -19,7 +19,7 @@ namespace Verhaeg.IoT.Processor
         protected CancellationTokenSource cts;
 
         // Logging
-        protected Serilog.ILogger Log;
+        protected ILogger Log;
 
         protected TaskManager(string name)
         {
