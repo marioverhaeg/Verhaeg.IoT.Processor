@@ -73,8 +73,15 @@ namespace Verhaeg.IoT.Processor
             Log.Debug("Pushed message into processing queue.");
             Log.Debug("Queuesize: " + cq.Count.ToString());
 
-            // Read queue
-            ewh.Set();
+            try
+            {
+                // Read queue
+                ewh.Set();
+            }
+            catch (Exception ex)
+            {
+                Log.Debug(ex.ToString());
+            }
 
             // Check queue status
             if (t.IsCompleted || t.IsFaulted)
