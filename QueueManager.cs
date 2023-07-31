@@ -2,6 +2,7 @@
 
 // Extra
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
@@ -46,7 +47,6 @@ namespace Verhaeg.IoT.Processor
                 if (cq.Count > 0)
                 {
                     // Read message from queue
-                    //Log.Debug("Reading message from queue...");
                     Read();
                 }
                 else
@@ -62,7 +62,6 @@ namespace Verhaeg.IoT.Processor
         {
             object obj;
             cq.TryDequeue(out obj);
-            //Log.Debug("Removed message from queue.");
             Process(obj);
         }
 
@@ -70,7 +69,6 @@ namespace Verhaeg.IoT.Processor
         public void Write(object obj)
         {
             cq.Enqueue(obj);
-            Log.Debug("Pushed message into processing queue.");
             Log.Debug("Queuesize: " + cq.Count.ToString());
 
             try

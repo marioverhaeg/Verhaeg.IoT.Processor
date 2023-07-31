@@ -20,14 +20,27 @@ namespace Verhaeg.IoT.Processor
                 .AddJsonFile("appsettings.json")
                 .Build();
             // Serilog configuration
-            // Logging
-            Serilog.ILogger Log = new LoggerConfiguration()
-                       .WriteTo.File("log" + Path.AltDirectorySeparatorChar + name + ".log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 5, 
-                       outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] <{ThreadId}> {Message:lj} {NewLine}{Exception}")
-                       .ReadFrom.Configuration(slconf)
-                       .Enrich.WithThreadId()
-                       .CreateLogger();
-            return Log;
+            string machinename = System.Environment.MachineName;
+            if (machinename.ToLower().Contains("mario"))
+            {
+                Serilog.ILogger Log = new LoggerConfiguration()
+                           .WriteTo.File("log" + Path.AltDirectorySeparatorChar + name + ".log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10,
+                           outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] <{ThreadId}> {Message:lj} {NewLine}{Exception}")
+                           .Enrich.WithThreadId()
+                           .MinimumLevel.Debug()
+                           .CreateLogger();
+                return Log;
+            }
+            else
+            {
+                Serilog.ILogger Log = new LoggerConfiguration()
+                           .WriteTo.File("log" + Path.AltDirectorySeparatorChar + name + ".log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 5,
+                           outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] <{ThreadId}> {Message:lj} {NewLine}{Exception}")
+                           .ReadFrom.Configuration(slconf)
+                           .Enrich.WithThreadId()
+                           .CreateLogger();
+                return Log;
+            }
         }
     }
 }
