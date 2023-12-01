@@ -69,8 +69,7 @@ namespace Verhaeg.IoT.Processor
         public void Write(object obj)
         {
             cq.Enqueue(obj);
-            Log.Debug("Queuesize: " + cq.Count.ToString());
-
+            //Log.Debug("Queuesize: " + cq.Count.ToString());
             try
             {
                 // Read queue
@@ -78,7 +77,7 @@ namespace Verhaeg.IoT.Processor
             }
             catch (Exception ex)
             {
-                Log.Debug(ex.ToString());
+                Log.Error(ex.ToString());
             }
 
             // Check queue status
@@ -87,7 +86,7 @@ namespace Verhaeg.IoT.Processor
                 Log.Error("QueueManager has issues. Stopping QueueManager.");
                 if (t.Exception != null)
                 {
-                    Log.Debug(t.Exception.ToString());
+                    Log.Error(t.Exception.ToString());
                 }
 
                 Log.Error("Restarting QueueManager...");

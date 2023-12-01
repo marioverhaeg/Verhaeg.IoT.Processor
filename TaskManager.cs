@@ -17,6 +17,7 @@ namespace Verhaeg.IoT.Processor
         protected EventWaitHandle ewh;
         protected Task t;
         protected CancellationTokenSource cts;
+        protected CancellationToken ct;
 
         // Logging
         protected ILogger Log;
@@ -31,7 +32,7 @@ namespace Verhaeg.IoT.Processor
             ewh = new AutoResetEvent(false);
             // Start new read thread
             cts = new CancellationTokenSource();
-            CancellationToken ct = cts.Token;
+            ct = cts.Token;
             t = Task.Factory.StartNew(() => Process(), ct);
         }
 
