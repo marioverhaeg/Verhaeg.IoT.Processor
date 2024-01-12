@@ -38,6 +38,7 @@ namespace Verhaeg.IoT.Processor
 
         public virtual void Dispose()
         {
+            Log.Debug("Dispose...");
             Stop();
         }
 
