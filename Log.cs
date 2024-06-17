@@ -17,7 +17,7 @@ namespace Verhaeg.IoT.Processor
         {
             // Serilog configuration
             var slconf = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(AppContext.BaseDirectory)
                 .AddJsonFile("appsettings.json")
                 .Build();
 
@@ -28,7 +28,7 @@ namespace Verhaeg.IoT.Processor
             if (machinename.ToLower().Contains("mario"))
             {
                 Serilog.ILogger Log = new LoggerConfiguration()
-                           .WriteTo.File("log" + Path.AltDirectorySeparatorChar + solution_name + "_" + name + ".log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10,
+                           .WriteTo.File(AppContext.BaseDirectory + Path.AltDirectorySeparatorChar + "log" + Path.AltDirectorySeparatorChar + solution_name + "_" + name + ".log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10,
                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] <{ThreadId}> {Message:lj} {NewLine}{Exception}")
                            .Enrich.WithThreadId()
                            .MinimumLevel.Debug()
@@ -38,7 +38,7 @@ namespace Verhaeg.IoT.Processor
             else
             {
                 Serilog.ILogger Log = new LoggerConfiguration()
-                           .WriteTo.File("log" + Path.AltDirectorySeparatorChar + solution_name + "_" + name + ".log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10,
+                           .WriteTo.File(AppContext.BaseDirectory + Path.AltDirectorySeparatorChar + "log" + Path.AltDirectorySeparatorChar + solution_name + "_" + name + ".log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10,
                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] <{ThreadId}> {Message:lj} {NewLine}{Exception}")
                            .WriteTo.TcpSyslog("192.168.21.156", 514, solution_name + "_" + name, Serilog.Sinks.Syslog.FramingType.OCTET_COUNTING, Serilog.Sinks.Syslog.SyslogFormat.RFC5424,
                            Serilog.Sinks.Syslog.Facility.Local0, false, null, null, null, Serilog.Events.LogEventLevel.Error, name, null, machinename, null, null)
