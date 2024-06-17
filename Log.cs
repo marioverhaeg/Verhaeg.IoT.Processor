@@ -77,9 +77,9 @@ namespace Verhaeg.IoT.Processor
                 sn = sn.Replace(".", "_");
                 return sn;
             }
-            catch 
+            catch
             {
-                return "Unknown_Application";
+                return AppDomain.CurrentDomain.FriendlyName; 
             }
         }
     }
