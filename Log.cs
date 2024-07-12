@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 
 using Serilog;
-using Serilog.Enrichers;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -44,6 +43,7 @@ namespace Verhaeg.IoT.Processor
                            Serilog.Sinks.Syslog.Facility.Local0, false, null, null, null, Serilog.Events.LogEventLevel.Error, name, null, machinename, null, null)
                            .ReadFrom.Configuration(slconf)
                            .Enrich.WithThreadId()
+                           .WriteTo.Console()
                            .CreateLogger();
                 return Log;
             }
