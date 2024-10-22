@@ -43,7 +43,6 @@ namespace Verhaeg.IoT.Processor
                            Serilog.Sinks.Syslog.Facility.Local0, false, null, null, null, Serilog.Events.LogEventLevel.Error, name, null, machinename, null, null)
                            .ReadFrom.Configuration(slconf)
                            .Enrich.WithThreadId()
-                           .WriteTo.Console()
                            .CreateLogger();
                 return Log;
             }
