@@ -25,7 +25,7 @@ namespace Verhaeg.IoT.Processor
         {
             // Serilog Configuration
             Log = Processor.Log.CreateLog(name);
-            Log.Debug("Created new log: " + name);
+            Log.Information("Created new log: " + name);
 
             // Thread monitoring
             cq = new ConcurrentQueue<object>();
