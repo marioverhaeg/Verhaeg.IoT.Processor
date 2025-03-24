@@ -42,8 +42,8 @@ namespace Verhaeg.IoT.Processor
                 Serilog.ILogger Log = new LoggerConfiguration()
                            .WriteTo.File(logpath + Path.AltDirectorySeparatorChar + name + ".log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 10,
                            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] <{ThreadId}> {Message:lj} {NewLine}{Exception}")
-                           .WriteTo.TcpSyslog("192.168.21.156", 514, name, Serilog.Sinks.Syslog.FramingType.OCTET_COUNTING, Serilog.Sinks.Syslog.SyslogFormat.RFC5424,
-                           Serilog.Sinks.Syslog.Facility.Local0, false, null, null, null, Serilog.Events.LogEventLevel.Error, name, null, solution_name, null, null)
+                           //.WriteTo.TcpSyslog("192.168.21.156", 514, name, Serilog.Sinks.Syslog.FramingType.OCTET_COUNTING, Serilog.Sinks.Syslog.SyslogFormat.RFC5424,
+                           //Serilog.Sinks.Syslog.Facility.Local0, false, null, null, null, Serilog.Events.LogEventLevel.Error, name, null, solution_name, null, null)
                            .ReadFrom.Configuration(slconf)
                            .Enrich.WithThreadId()
                            .CreateLogger();
