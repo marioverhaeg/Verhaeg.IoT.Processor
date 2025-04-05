@@ -49,6 +49,7 @@ namespace Verhaeg.IoT.Processor
                            .CreateLogger();
                 return Log;
             }
+            
         }
 
         private static string GetSolutionName()
