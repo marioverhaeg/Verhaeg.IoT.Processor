@@ -571,21 +571,14 @@ All components are designed for thread-safe operation:
 
 ## Version History
 
-- **1.2.0** - Current version
-  - Added generic QueueManager<T> and TaskManager<T> classes
-  - Added GetInstance() factory methods for singleton pattern
-  - Replaced EventWaitHandle with SemaphoreSlim for async compatibility
-  - Added StopAsync() methods with timeout support
-  - Added metrics (QueueLength, ProcessedCount, ErrorCount, IterationCount)
-  - Added [Obsolete] attributes to legacy non-generic classes
-  - Improved thread safety and error handling
+- **1.0.9** - Current version
+  - Added README.md to NuGet package for better documentation visibility
+  - Added GitHub Actions workflow for NuGet trusted publishing with OIDC
+  - Fixed EventWaitHandle with SemaphoreSlim for async compatibility
+  - Fixed Task.Factory.StartNew parameter order
+  - Made Dispose() public in non-generic QueueManager
 
-- **1.1.0** - Internal improvements
-  - Replaced EventWaitHandle with SemaphoreSlim
-  - Added StopAsync() with timeout support
-  - Improved Stop() behavior with timeout
-
-- **1.0.8** - Initial version
+- **1.0.8** - Previous version
   - Base class for thread-safe queue and task manager
   - Serilog wrapper
 

@@ -12,7 +12,7 @@
     <RepositoryUrl>https://github.com/marioverhaeg/Verhaeg.IoT.Processor</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageTags>log queue task</PackageTags>
-    <Version>1.0.8</Version>
+    <Version>1.0.9</Version>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
     <Deterministic>false</Deterministic>
