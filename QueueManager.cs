@@ -214,7 +214,7 @@ namespace Verhaeg.IoT.Processor
         /// <summary>
         /// Disposes the queue manager resources.
         /// </summary>
-        protected abstract void Dispose();
+        public abstract void Dispose();
 
         /// <summary>
         /// Processes a queued item.
