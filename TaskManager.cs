@@ -49,7 +49,7 @@ namespace Verhaeg.IoT.Processor
             // Start new read thread
             cts = new CancellationTokenSource();
             ct = cts.Token;
-            t = Task.Factory.StartNew(() => RunProcess(), ct, TaskCreationOptions.LongRunning);
+            t = Task.Factory.StartNew(() => RunProcess(), ct, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         private void RunProcess()
@@ -76,7 +76,7 @@ namespace Verhaeg.IoT.Processor
         /// <summary>
         /// Stops the task manager.
         /// </summary>
-        [Obsolete("Use StopAsync() for async scenarios. This method may not properly await completion.")]
+        [Obsolete("Use StopAsync() for async scenarios. This method may deadlock if called from a synchronization context.")]
         public virtual void Stop()
         {
             Log.Debug("Stop command received...");
@@ -237,7 +237,7 @@ namespace Verhaeg.IoT.Processor
             // Start new read thread
             cts = new CancellationTokenSource();
             ct = cts.Token;
-            t = Task.Factory.StartNew(() => RunProcess(), ct, TaskCreationOptions.LongRunning);
+            t = Task.Factory.StartNew(() => RunProcess(), ct, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         private void RunProcess()

@@ -56,7 +56,7 @@ namespace Verhaeg.IoT.Processor
 
             // Start new read thread
             cts = new CancellationTokenSource();
-            t = Task.Factory.StartNew(() => Start(), cts.Token, TaskCreationOptions.LongRunning);
+            t = Task.Factory.StartNew(() => Start(), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         private void Start()
@@ -142,7 +142,7 @@ namespace Verhaeg.IoT.Processor
                 }
 
                 cts = new CancellationTokenSource();
-                t = Task.Factory.StartNew(() => Start(), cts.Token, TaskCreationOptions.LongRunning);
+                t = Task.Factory.StartNew(() => Start(), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             }
         }
 
@@ -314,7 +314,7 @@ namespace Verhaeg.IoT.Processor
 
             // Start new read thread
             cts = new CancellationTokenSource();
-            t = Task.Factory.StartNew(() => Start(), cts.Token, TaskCreationOptions.LongRunning);
+            t = Task.Factory.StartNew(() => Start(), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         private void Start()
@@ -401,7 +401,7 @@ namespace Verhaeg.IoT.Processor
                 }
 
                 cts = new CancellationTokenSource();
-                t = Task.Factory.StartNew(() => Start(), cts.Token, TaskCreationOptions.LongRunning);
+                t = Task.Factory.StartNew(() => Start(), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             }
         }
 
