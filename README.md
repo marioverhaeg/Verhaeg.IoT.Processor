@@ -12,19 +12,31 @@ Verhaeg.IoT.Processor offers three core components:
 A static utility class that simplifies Serilog configuration with automatic file path management and solution name detection. Creates log files with rolling daily rotation and thread ID enrichment.
 
 ### 2. QueueManager - Thread-Safe Queue Processor
-An abstract, thread-safe singleton queue that processes objects asynchronously. Features include:
+An abstract, thread-safe queue that processes objects asynchronously. Available in two versions:
+- **QueueManager** (legacy, non-generic) - Deprecated, use QueueManager<T> instead
+- **QueueManager<T>** (recommended) - Generic version with type safety
+
+Features include:
 - Concurrent queue for thread safety
 - Automatic background task with self-restart on failure
 - Graceful shutdown with queue draining
-- Event-driven waiting for efficiency
+- Async-compatible waiting with SemaphoreSlim
 - Built-in Serilog integration
+- Singleton pattern support via GetInstance()
+- Metrics (QueueLength, ProcessedCount, ErrorCount)
 
 ### 3. TaskManager - Thread-Safe Background Task
-An abstract, thread-safe singleton for running continuous background tasks. Features include:
+An abstract, thread-safe background task manager. Available in two versions:
+- **TaskManager** (legacy, non-generic) - Deprecated, use TaskManager<T> instead
+- **TaskManager<T>** (recommended) - Generic version with improved functionality
+
+Features include:
 - Automatic background task management
-- Event-driven waiting
+- Async-compatible waiting with SemaphoreSlim
 - Proper disposal support
 - Built-in Serilog integration
+- Singleton pattern support via GetInstance()
+- Metrics (IterationCount)
 
 ## Installation
 
@@ -51,6 +63,12 @@ Add Serilog configuration to your `appsettings.json`:
 }
 ```
 
+---
+
+## 📋 Component Documentation
+
+---
+
 ### 1. Log
 
 Create a Serilog logger with automatic path configuration:
@@ -76,36 +94,60 @@ logger.Error("Error message");
 - On other machines: `/log/{SolutionName}/{logname}.log` and `/log/error/{SolutionName}/{logname}.log` (errors only)
 - Reads additional configuration from `appsettings.json`
 
+---
+
 ### 2. QueueManager
 
-Create a custom queue processor by inheriting from `QueueManager`:
+#### ⚠️ Legacy Non-Generic Version (Deprecated)
+
+The original `QueueManager` class is still available for backward compatibility but is **deprecated**. Use `QueueManager<T>` for new code.
+
+```csharp
+[Obsolete("Use QueueManager<T> for type safety")]
+public class MyQueueProcessor : Processor.QueueManager
+{
+    public MyQueueProcessor(string name) : base(name) { }
+    
+    protected override void Process(object obj)
+    {
+        if (obj is MyData data)
+        {
+            // Process data
+        }
+    }
+    
+    protected override void Dispose() { }
+}
+```
+
+#### ✅ Recommended: Generic QueueManager<T>
+
+**Basic Usage:**
 
 ```csharp
 using Verhaeg.IoT.Processor;
 
-public class MyQueueProcessor : Processor.QueueManager
+public class MyData
 {
-    public static MyQueueProcessor Instance { get; private set; }
+    public int Id { get; set; }
+    public string Value { get; set; }
+}
+
+public class MyQueueProcessor : Processor.QueueManager<MyData>
+{
+    public MyQueueProcessor(string name) : base(name) { }
     
-    public MyQueueProcessor(string name) : base(name)
+    protected override void Process(MyData data)
     {
-        Instance = this;
+        Log.Information("Processing item {Id}: {Value}", data.Id, data.Value);
+        // Your processing logic here
     }
     
-    protected override void Process(object obj)
+    // Optional: override Dispose for cleanup
+    public override void Dispose()
     {
-        // Process each item from the queue
-        if (obj is MyData data)
-        {
-            Log.Information("Processing: {Data}", data);
-            // Your processing logic here
-        }
-    }
-    
-    protected override void Dispose()
-    {
-        // Clean up resources
         Log.Information("Disposing MyQueueProcessor");
+        base.Dispose();
     }
 }
 
@@ -117,35 +159,115 @@ processor.Write(new MyData { Id = 1, Value = "Test" });
 
 // Stop gracefully (waits for queue to empty)
 processor.Stop();
+
+// Or use async
+await processor.StopAsync(TimeSpan.FromSeconds(30));
+```
+
+**Singleton Pattern:**
+
+```csharp
+public class MyQueueProcessor : Processor.QueueManager<MyData>
+{
+    public static MyQueueProcessor Instance { get; private set; }
+    
+    private MyQueueProcessor(string name) : base(name) { }
+    
+    protected override void Process(MyData data)
+    {
+        Log.Information("Processing: {Data}", data);
+    }
+    
+    // Factory method for singleton
+    public static MyQueueProcessor GetInstance(string name = "MyQueue")
+    {
+        return Instance ??= new MyQueueProcessor(name);
+    }
+}
+
+// Usage
+var processor = MyQueueProcessor.GetInstance();
+processor.Write(new MyData());
+```
+
+**Or use built-in GetInstance:**
+
+```csharp
+// Automatically manages singleton instances
+var processor = Processor.QueueManager<MyData>.GetInstance<MyQueueProcessor>("MyQueue");
+```
+
+**Async Usage:**
+
+```csharp
+// Write items
+processor.Write(new MyData());
+
+// Stop with timeout
+await processor.StopAsync(TimeSpan.FromSeconds(10));
+```
+
+**Metrics:**
+
+```csharp
+int pending = processor.QueueLength;
+int processed = processor.ProcessedCount;
+int errors = processor.ErrorCount;
 ```
 
 **Features:**
-- Thread-safe concurrent queue
-- Auto-starting background processor task
-- Automatic restart if task fails
-- Efficient waiting with `EventWaitHandle`
-- Graceful stop: waits until all queued items are processed
-- Built-in error logging
+- ✅ Type safety (no casting needed)
+- ✅ Thread-safe concurrent queue
+- ✅ Auto-starting background processor task
+- ✅ Automatic restart if task fails
+- ✅ Efficient async-compatible waiting with SemaphoreSlim
+- ✅ Graceful stop: waits until all queued items are processed (with timeout)
+- ✅ Built-in error logging and metrics
+- ✅ Singleton pattern support
+- ⚠️ Backward compatible: old QueueManager still works but is deprecated
+
+---
 
 ### 3. TaskManager
 
-Create a custom background task by inheriting from `TaskManager`:
+#### ⚠️ Legacy Non-Generic Version (Deprecated)
+
+The original `TaskManager` class is still available for backward compatibility but is **deprecated**. Use `TaskManager<T>` for new code.
+
+```csharp
+[Obsolete("Use TaskManager<T> for improved functionality")]
+public class MyBackgroundTask : Processor.TaskManager
+{
+    public MyBackgroundTask(string name) : base(name) { }
+    
+    protected override void Process()
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            Log.Information("Background task running...");
+            ewh.WaitOne(1000);
+        }
+    }
+}
+```
+
+#### ✅ Recommended: Generic TaskManager<T>
+
+**Basic Usage:**
 
 ```csharp
 using Verhaeg.IoT.Processor;
 
-public class MyBackgroundTask : Processor.TaskManager
+public class MyBackgroundTask : Processor.TaskManager<MyContext>
 {
-    public static MyBackgroundTask Instance { get; private set; }
+    private MyContext _context;
     
-    public MyBackgroundTask(string name) : base(name)
-    {
-        Instance = this;
-    }
+    public MyBackgroundTask(string name) : base(name) { }
     
     protected override void Process()
     {
-        // Your background task logic
+        Log.Information("Background task started");
+        
         while (!ct.IsCancellationRequested)
         {
             Log.Information("Background task running...");
@@ -153,27 +275,80 @@ public class MyBackgroundTask : Processor.TaskManager
             // Do work here
             
             // Wait for signal or timeout
-            ewh.WaitOne(1000); // Wait 1 second
+            _signal.Wait(ct, TimeSpan.FromSeconds(1));
         }
+        
+        Log.Information("Background task stopped");
     }
 }
 
 // Usage
 var task = new MyBackgroundTask("MyTask");
 
+// Signal the task to wake up
+task.Signal();
+
 // Stop the task
 task.Stop();
 
-// Or dispose (calls Stop internally)
-task.Dispose();
+// Or use async
+await task.StopAsync(TimeSpan.FromSeconds(5));
+```
+
+**Singleton Pattern:**
+
+```csharp
+public class MyBackgroundTask : Processor.TaskManager<object>
+{
+    public static MyBackgroundTask Instance { get; private set; }
+    
+    private MyBackgroundTask(string name) : base(name) { }
+    
+    protected override void Process()
+    {
+        while (!ct.IsCancellationRequested)
+        {
+            Log.Information("Running...");
+            _signal.Wait(ct, TimeSpan.FromSeconds(1));
+        }
+    }
+    
+    public static MyBackgroundTask GetInstance(string name = "MyTask")
+    {
+        return Instance ??= new MyBackgroundTask(name);
+    }
+}
+
+// Usage
+var task = MyBackgroundTask.GetInstance();
+task.Signal();
+```
+
+**Or use built-in GetInstance:**
+
+```csharp
+// Automatically manages singleton instances
+var task = Processor.TaskManager<object>.GetInstance<MyBackgroundTask>("MyTask");
+```
+
+**Metrics:**
+
+```csharp
+int iterations = task.IterationCount;
 ```
 
 **Features:**
-- Auto-starting background task
-- Implements `IDisposable` for proper resource cleanup
-- Event-driven waiting with `EventWaitHandle`
-- Built-in cancellation token support
-- Built-in error logging
+- ✅ Improved async support
+- ✅ SemaphoreSlim for efficient waiting
+- ✅ Auto-starting background task
+- ✅ Implements IDisposable for proper resource cleanup
+- ✅ Built-in cancellation token support
+- ✅ Built-in error logging
+- ✅ Signal() method to wake up the task
+- ✅ Singleton pattern support
+- ⚠️ Backward compatible: old TaskManager still works but is deprecated
+
+---
 
 ## Configuration
 
@@ -218,31 +393,162 @@ The logger reads from `appsettings.json` in your application's base directory. E
 }
 ```
 
+---
+
+## Migration Guide
+
+### From Non-Generic to Generic QueueManager
+
+**Before (v1.0):**
+```csharp
+public class MyProcessor : Processor.QueueManager
+{
+    public MyProcessor(string name) : base(name) { }
+    
+    protected override void Process(object obj)
+    {
+        if (obj is MyData data)
+        {
+            // Process data
+        }
+    }
+    
+    protected override void Dispose() { }
+}
+
+var processor = new MyProcessor("MyQueue");
+processor.Write(myData);
+processor.Stop();
+```
+
+**After (v1.2+):**
+```csharp
+public class MyProcessor : Processor.QueueManager<MyData>
+{
+    public MyProcessor(string name) : base(name) { }
+    
+    protected override void Process(MyData data)
+    {
+        // Process data directly (no casting)
+    }
+}
+
+var processor = new MyProcessor("MyQueue");
+processor.Write(myData);  // Strong typing
+await processor.StopAsync(TimeSpan.FromSeconds(30));
+```
+
+### Changes in v1.2
+
+| Feature | v1.0 | v1.2 | Migration Notes |
+|---------|------|------|-----------------|
+| QueueManager | Non-generic | Both (generic recommended) | Use QueueManager<T> for new code |
+| TaskManager | Non-generic | Both (generic recommended) | Use TaskManager<T> for new code |
+| Waiting mechanism | EventWaitHandle | SemaphoreSlim (internal) | No code changes needed |
+| Stop() | Synchronous, could deadlock | Synchronous with timeout | Behavior improved, backward compatible |
+| StopAsync() | Not available | Available | Use for async scenarios |
+| GetInstance() | Not available | Available | Use for singleton pattern |
+| Metrics | Not available | QueueLength, ProcessedCount, ErrorCount | Use for monitoring |
+
+---
+
 ## Best Practices
 
-1. **Singleton Pattern**: Create one instance of each manager per application and reuse it via a static `Instance` property.
+### 1. **Use Generic Versions**
+```csharp
+// ✅ Recommended
+public class MyProcessor : Processor.QueueManager<MyData> { ... }
 
-2. **Graceful Shutdown**: Always call `Stop()` or `Dispose()` when shutting down your application to ensure all queued items are processed.
+// ❌ Avoid (deprecated)
+public class MyProcessor : Processor.QueueManager { ... }
+```
 
-3. **Error Handling**: The built-in logging captures exceptions, but implement additional error handling in your `Process()` methods.
+### 2. **Use Singleton Pattern**
+```csharp
+// ✅ Recommended - use GetInstance
+var processor = Processor.QueueManager<MyData>.GetInstance<MyProcessor>("MyQueue");
 
-4. **Resource Management**: Override `Dispose()` in `QueueManager` to clean up any additional resources.
+// Or implement your own singleton
+public class MyProcessor : Processor.QueueManager<MyData>
+{
+    public static MyProcessor Instance { get; } = new MyProcessor("MyQueue");
+    private MyProcessor(string name) : base(name) { }
+}
+```
 
-5. **Log Rotation**: Log files rotate daily and retain 10 files by default. Adjust in your Serilog configuration if needed.
+### 3. **Graceful Shutdown with Async**
+```csharp
+// ✅ Recommended
+await processor.StopAsync(TimeSpan.FromSeconds(30));
+
+// ⚠️ Acceptable but may deadlock
+processor.Stop();
+```
+
+### 4. **Error Handling**
+```csharp
+protected override void Process(MyData data)
+{
+    try
+    {
+        // Your processing logic
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Failed to process item");
+        // Optionally: implement retry logic
+    }
+}
+```
+
+### 5. **Resource Management**
+```csharp
+// ✅ Always dispose or use using statement
+using (var processor = new MyProcessor("MyQueue"))
+{
+    // Use processor
+    processor.Write(item);
+    
+    // Stop when done
+    await processor.StopAsync(TimeSpan.FromSeconds(10));
+}
+// Dispose is called automatically
+```
+
+### 6. **Signal TaskManager**
+```csharp
+// For TaskManager, use Signal() to wake up the task
+var task = new MyBackgroundTask("MyTask");
+
+// Wake up the task
+task.Signal();
+
+// Stop when done
+await task.StopAsync(TimeSpan.FromSeconds(5));
+```
+
+### 7. **Log Rotation**
+Log files rotate daily and retain 10 files by default. Adjust in your Serilog configuration if needed.
+
+---
 
 ## Thread Safety
 
 All components are designed for thread-safe operation:
 
-- **QueueManager**: Uses `ConcurrentQueue<object>` for thread-safe enqueue/dequeue operations
-- **TaskManager**: Uses proper synchronization primitives for thread safety
+- **QueueManager<T>**: Uses `ConcurrentQueue<T>` for thread-safe enqueue/dequeue operations
+- **TaskManager<T>**: Uses `SemaphoreSlim` for thread-safe signaling
 - **Log**: Each logger instance is thread-safe (Serilog's design)
+
+---
 
 ## Platform Support
 
 - .NET 10.0
 - Windows and Linux (automatic path handling)
 - Supports ARM64, x64 architectures
+
+---
 
 ## Dependencies
 
@@ -252,6 +558,8 @@ All components are designed for thread-safe operation:
 - [Serilog.Sinks.File](https://github.com/serilog/serilog-sinks-file)
 - [Microsoft.Extensions.Configuration.Json](https://learn.microsoft.com/en-us/dotnet/api/microsoft.extensions.configuration.jsonconfigurationextensions)
 
+---
+
 ## Project Information
 
 - **Author**: Mario Verhaeg
@@ -259,10 +567,31 @@ All components are designed for thread-safe operation:
 - **Repository**: https://github.com/marioverhaeg/Verhaeg.IoT.Processor
 - **Website**: https://www.marioverhaeg.nl
 
+---
+
 ## Version History
 
-- **1.0.8** - Current version
-- See [GitHub Releases](https://github.com/marioverhaeg/Verhaeg.IoT.Processor/releases) for details
+- **1.2.0** - Current version
+  - Added generic QueueManager<T> and TaskManager<T> classes
+  - Added GetInstance() factory methods for singleton pattern
+  - Replaced EventWaitHandle with SemaphoreSlim for async compatibility
+  - Added StopAsync() methods with timeout support
+  - Added metrics (QueueLength, ProcessedCount, ErrorCount, IterationCount)
+  - Added [Obsolete] attributes to legacy non-generic classes
+  - Improved thread safety and error handling
+
+- **1.1.0** - Internal improvements
+  - Replaced EventWaitHandle with SemaphoreSlim
+  - Added StopAsync() with timeout support
+  - Improved Stop() behavior with timeout
+
+- **1.0.8** - Initial version
+  - Base class for thread-safe queue and task manager
+  - Serilog wrapper
+
+See [GitHub Releases](https://github.com/marioverhaeg/Verhaeg.IoT.Processor/releases) for details.
+
+---
 
 ## Contributing
 
