@@ -155,7 +155,7 @@ namespace Verhaeg.IoT.Processor
         /// <summary>
         /// The main processing method to be implemented by derived classes.
         /// </summary>
-        protected abstract void Process();
+        public abstract void Process();
     }
 
     /// <summary>
@@ -348,6 +348,6 @@ namespace Verhaeg.IoT.Processor
         /// This method is called repeatedly until the task manager is stopped.
         /// Use Signal() to wake up the task, or implement a polling loop.
         /// </summary>
-        protected abstract void Process();
+        public abstract void Process();
     }
 }
