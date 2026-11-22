@@ -276,37 +276,25 @@ namespace Verhaeg.IoT.Processor
         /// <summary>
         /// Stops the task manager.
         /// </summary>
-        [Obsolete("Use StopAsync() for async scenarios. This method may deadlock if called from a synchronization context.")]
         public virtual void Stop()
-        {
-            StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
-        }
-
-        /// <summary>
-        /// Stops the task manager asynchronously.
-        /// </summary>
-        /// <param name="timeout">Maximum time to wait for graceful shutdown.</param>
-        /// <returns>A task that completes when the task manager has stopped.</returns>
-        public virtual async Task StopAsync(TimeSpan timeout)
         {
             if (string.IsNullOrEmpty(_instanceName))
                 _instanceName = "unnamed";
-                
+
             Log.Debug("Stop command received for task manager '{Name}'...", _instanceName);
-            
+
             blKeepRunning = false;
             cts.Cancel();
             _signal.Release();
-            
+
             // Wait for task to complete
             try
             {
                 if (t != null)
                 {
-                    using var timeoutCts = new CancellationTokenSource(timeout);
+                    using var timeoutCts = new CancellationTokenSource(30000);
                     var combinedCt = CancellationTokenSource.CreateLinkedTokenSource(ct, timeoutCts.Token);
-                    
-                    await t;
+                    t.Wait();
                 }
             }
             catch (OperationCanceledException)
@@ -317,15 +305,16 @@ namespace Verhaeg.IoT.Processor
             {
                 Log.Error(ex, "Error during task manager '{Name}' shutdown", _instanceName);
             }
-            
+
             // Remove from singleton instances
             if (!string.IsNullOrEmpty(_instanceName))
             {
                 _instances.TryRemove(_instanceName, out _);
             }
-            
+
             Log.Debug("Task manager '{Name}' stopped.", _instanceName);
         }
+
 
         /// <summary>
         /// Disposes the task manager resources.

@@ -149,64 +149,32 @@ namespace Verhaeg.IoT.Processor
         /// <summary>
         /// Stops the queue manager and waits for all queued items to be processed.
         /// </summary>
-        /// <param name="timeout">Maximum time to wait for queue to empty. Default is 30 seconds.</param>
-        [Obsolete("Use StopAsync() for async scenarios. This method may deadlock if called from a synchronization context.")]
         public virtual void Stop()
         {
-            StopAsync(TimeSpan.FromSeconds(30)).GetAwaiter().GetResult();
-        }
-
-        /// <summary>
-        /// Stops the queue manager asynchronously and waits for all queued items to be processed.
-        /// </summary>
-        /// <param name="timeout">Maximum time to wait for queue to empty.</param>
-        /// <returns>A task that completes when the queue manager has stopped.</returns>
-        public virtual async Task StopAsync(TimeSpan timeout)
-        {
             Log.Debug("Stop command received, checking queue...");
-            
+
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-            
+
             // Wait for queue to empty or timeout
-            while (QueueLength > 0 && stopwatch.Elapsed < timeout)
+            while (QueueLength > 0 && stopwatch.Elapsed < new TimeSpan(5000))
             {
                 Log.Debug("Queue not empty ({Count} items), waiting...", QueueLength);
-                await Task.Delay(100, cts.Token);
+                System.Threading.Thread.Sleep(5000);
             }
-            
+
             if (QueueLength > 0)
             {
                 Log.Warning("Queue still has {Count} items after timeout", QueueLength);
             }
-            
+
             // Signal shutdown
             blKeepRunning = false;
             cts.Cancel();
-            
+
             // Release any waiting threads
             _signal.Release();
             ewh.Set();
-            
-            // Wait for task to complete
-            try
-            {
-                if (t != null)
-                {
-                    await t; // Wait for current processing to finish
-                }
-            }
-            catch (AggregateException ae)
-            {
-                foreach (var ex in ae.InnerExceptions)
-                {
-                    Log.Error(ex, "Error during queue manager shutdown");
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "Error during queue manager shutdown");
-            }
-            
+
             Log.Debug("Queue manager stopped.");
             Dispose();
         }

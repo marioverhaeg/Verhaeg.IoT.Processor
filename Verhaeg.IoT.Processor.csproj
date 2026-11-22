@@ -7,7 +7,7 @@
     <Authors>Mario Verhaeg</Authors>
     <Product>Verhaeg.IoT</Product>
     <PackageProjectUrl>https://www.marioverhaeg.nl</PackageProjectUrl>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageIcon></PackageIcon>
     <RepositoryUrl>https://github.com/marioverhaeg/Verhaeg.IoT.Processor</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
@@ -25,10 +25,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.14" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.14" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.14" />
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.10.94">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Serilog" Version="4.4.0" />
     <PackageReference Include="Serilog.Enrichers.Thread" Version="4.0.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="10.0.1" />
@@ -40,9 +36,5 @@
   <ItemGroup>
     <Content Include="README.md" PackagePath="" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="dotnet pack D:\DataMario\Ontwikkeling\IoT\Verhaeg.IoT.Processor -c Release -o &quot;D:\DataMario\Ontwikkeling\IoT\NuGet packages&quot;" />
-  </Target>
 
 </Project>
