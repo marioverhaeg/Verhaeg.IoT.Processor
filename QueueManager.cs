@@ -194,7 +194,7 @@ namespace Verhaeg.IoT.Processor
     /// Thread-safe queue manager with generic type support.
     /// </summary>
     /// <typeparam name="T">The type of items in the queue.</typeparam>
-    public abstract class QueueManager<T> : IDisposable where T : class
+    public abstract class QueueManager<T> : IDisposable where T : notnull
     {
         // Fields
         protected ConcurrentQueue<T> cq;
